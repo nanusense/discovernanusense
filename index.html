@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en" id="nsd-html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover stories from Nanusense — browse by category or shuffle into something unexpected.">
+  <title>Nanusense / Discover</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: #0f0f0f;
+      transition: background .35s;
+    }
+    body.light { background: #f2f0eb; }
+  </style>
+</head>
+<body>
+
+<style>
+/* ═══════════════════════════════════════════════
+   NANUSENSE DISCOVER — Netflix-style
+═══════════════════════════════════════════════ */
+.nsd {
+  --bg:       #0f0f0f;
+  --surface:  #1a1a1a;
+  --surface2: #252525;
+  --text:     #e8e8e8;
+  --muted:    #777;
+  --border:   #2d2d2d;
+  --hdr:      rgba(15,15,15,.92);
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', system-ui, sans-serif;
+  min-height: 100vh;
+  transition: background .35s, color .35s;
+}
+
+.nsd[data-theme="light"] {
+  --bg:       #f2f0eb;
+  --surface:  #ffffff;
+  --surface2: #e8e5de;
+  --text:     #111111;
+  --muted:    #777;
+  --border:   #ddd;
+  --hdr:      rgba(242,240,235,.92);
+}
+
+/* ─── HEADER ─────────────────────────── */
+.nsd-hdr {
+  position: sticky;
+  top: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  background: var(--hdr);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  transition: background .35s;
+}
+
+.nsd[data-theme="light"] .nsd-hdr {
+  border-bottom: 1px solid var(--border);
+}
+
+.nsd-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.nsd-logo-main {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: .06em;
+  color: #fff;
+  transition: color .35s;
+}
+
+.nsd[data-theme="light"] .nsd-logo-main { color: #111; }
+
+.nsd-logo-sub {
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.nsd-hdr-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nsd-theme-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color .2s, transform .3s, background .35s;
+  flex-shrink: 0;
+}
+.nsd-theme-btn:hover {
+  border-color: var(--muted);
+  transform: rotate(22deg);
+}
+.nsd-theme-btn svg { width: 15px; height: 15px; }
+
+/* ─── HERO ───────────────────────────── */
+.nsd-hero {
+  position: relative;
+  height: 68vh;
+  min-height: 420px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.nsd-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+  transition: opacity .7s ease;
+}
+
+.nsd-hero-bg-next {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+  opacity: 0;
+}
+
+.nsd-hero-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(15,15,15,1) 0%,
+    rgba(15,15,15,.7) 30%,
+    rgba(15,15,15,.2) 60%,
+    rgba(15,15,15,.4) 100%
+  );
+  transition: background .35s;
+}
+
+.nsd[data-theme="light"] .nsd-hero-veil {
+  background: linear-gradient(
+    to top,
+    rgba(242,240,235,1) 0%,
+    rgba(0,0,0,.55) 30%,
+    rgba(0,0,0,.15) 60%,
+    rgba(0,0,0,.3) 100%
+  );
+}
+
+.nsd-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 56px 52px;
+  max-width: 620px;
+  transition: opacity .5s ease;
+}
+
+.nsd-hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 14px;
+}
+
+.nsd-hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(38px, 5.5vw, 66px);
+  line-height: 1.0;
+  letter-spacing: .03em;
+  color: #fff;
+  margin: 0 0 14px;
+  text-shadow: 0 4px 30px rgba(0,0,0,.5);
+}
+
+.nsd-hero-excerpt {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,255,255,.82);
+  line-height: 1.75;
+  margin-bottom: 26px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nsd-hero-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nsd-hero-btn-a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 26px;
+  border-radius: 5px;
+  background: #fff;
+  color: #000;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  -webkit-appearance: none;
+}
+.nsd-hero-btn-a:hover { background: rgba(255,255,255,.82); }
+
+.nsd-hero-btn-b {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 26px;
+  border-radius: 5px;
+  background: rgba(100,100,100,.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background .2s;
+  -webkit-appearance: none;
+}
+.nsd-hero-btn-b:hover { background: rgba(100,100,100,.65); }
+
+/* Hero dots */
+.nsd-hero-dots {
+  position: absolute;
+  bottom: 18px;
+  right: 56px;
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+}
+
+.nsd-hero-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.35);
+  cursor: pointer;
+  padding: 0;
+  transition: background .3s, transform .3s;
+  flex-shrink: 0;
+}
+.nsd-hero-dot.active {
+  background: #fff;
+  transform: scale(1.3);
+}
+
+/* Hero no-image fallback */
+.nsd-hero-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── MAIN ───────────────────────────── */
+.nsd-main {
+  padding: 40px 0 100px;
+}
+
+/* ─── ROW ────────────────────────────── */
+.nsd-row {
+  margin-bottom: 44px;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: nsd-in .5s ease forwards;
+}
+
+@keyframes nsd-in {
+  to { opacity: 1; transform: none; }
+}
+
+.nsd-row-hdr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 48px;
+  margin-bottom: 16px;
+}
+
+.nsd-row-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: .06em;
+  color: var(--row-color, #d4a853);
+  white-space: nowrap;
+}
+
+.nsd-row-count {
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.nsd-row-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  min-width: 16px;
+}
+
+.nsd-shuffle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--row-color, #d4a853);
+  background: transparent;
+  color: var(--row-color, #d4a853);
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s, color .2s;
+  -webkit-appearance: none;
+}
+.nsd-shuffle-btn:hover {
+  background: var(--row-color, #d4a853);
+  color: #fff;
+}
+.nsd-shuffle-btn svg { width: 12px; height: 12px; flex-shrink: 0; transition: transform .4s; }
+.nsd-shuffle-btn:hover svg { transform: rotate(180deg); }
+
+/* ─── TRACK ──────────────────────────── */
+.nsd-track-wrap { position: relative; }
+
+.nsd-track-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 18px;
+  width: 80px;
+  background: linear-gradient(to right, transparent, var(--bg));
+  pointer-events: none;
+  z-index: 2;
+  transition: background .35s;
+}
+
+.nsd-track {
+  display: flex;
+  gap: 10px;
+  padding: 10px 48px 22px;
+  overflow-x: auto;
+  overflow-y: clip;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.nsd-track::-webkit-scrollbar { height: 3px; }
+.nsd-track::-webkit-scrollbar-track { background: transparent; }
+.nsd-track::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── CARD ───────────────────────────── */
+.nsd-card {
+  position: relative;
+  flex: 0 0 230px;
+  height: 130px;
+  border-radius: 7px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--row-color, #d4a853) 0%, #1a1a1a 130%);
+  transition: transform .25s ease, box-shadow .25s ease;
+  z-index: 1;
+  text-decoration: none;
+  display: block;
+}
+.nsd-card:hover {
+  transform: scale(1.07) translateY(-5px);
+  box-shadow: 0 22px 44px rgba(0,0,0,.75);
+  z-index: 20;
+}
+
+.nsd-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+.nsd-card:hover .nsd-card-img { transform: scale(1.06); }
+
+.nsd-card-grad {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.92) 0%,
+    rgba(0,0,0,.35) 55%,
+    rgba(0,0,0,.0) 100%
+  );
+}
+
+.nsd-card-body {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 10px 12px;
+}
+
+.nsd-card-date {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 4px;
+}
+
+.nsd-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Hover overlay */
+.nsd-card-hover {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .22s;
+}
+.nsd-card:hover .nsd-card-hover { opacity: 1; }
+
+.nsd-card-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 4px;
+  background: rgba(255,255,255,.95);
+  color: #000;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+.nsd-card-play svg { width: 12px; height: 12px; }
+
+/* ─── SKELETON ───────────────────────── */
+.nsd-skel-card {
+  flex: 0 0 230px;
+  height: 130px;
+  border-radius: 7px;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+  background-size: 300% 100%;
+  animation: nsd-shimmer 1.7s infinite;
+}
+
+.nsd-skel-line {
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+  background-size: 300% 100%;
+  animation: nsd-shimmer 1.7s infinite;
+}
+
+@keyframes nsd-shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ─── MODAL OVERLAY ──────────────────── */
+.nsd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.nsd-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ─── MODAL PANEL ────────────────────── */
+.nsd-panel {
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  background: var(--surface);
+  border-radius: 14px 14px 0 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform .42s cubic-bezier(.32,.72,0,1), background .35s;
+  overflow: hidden;
+}
+.nsd-overlay.open .nsd-panel { transform: translateY(0); }
+
+/* Modal hero image */
+.nsd-panel-hero {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--surface2);
+}
+.nsd-panel-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.nsd-panel-hero-grad {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--surface) 0%, transparent 60%);
+}
+.nsd-panel-hero-no-img {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.08);
+  background: linear-gradient(135deg, var(--panel-color, #d4a853) 0%, var(--surface) 120%);
+}
+
+.nsd-panel-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 52px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  margin-top: -4px;
+}
+
+.nsd-panel-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.nsd-panel-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+  -webkit-appearance: none;
+}
+.nsd-panel-close:hover { color: var(--text); border-color: var(--muted); }
+
+.nsd-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 32px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.nsd-panel-body::-webkit-scrollbar { width: 3px; }
+.nsd-panel-body::-webkit-scrollbar-thumb { background: var(--border); }
+
+.nsd-panel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: .03em;
+  line-height: 1.05;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.nsd-panel-date {
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+.nsd-panel-content {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--text);
+}
+.nsd-panel-content p    { margin: 0 0 1.15em; }
+.nsd-panel-content h1,
+.nsd-panel-content h2,
+.nsd-panel-content h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  letter-spacing: .04em;
+  line-height: 1.1;
+  margin: 1.6em 0 .5em;
+  color: var(--text);
+}
+.nsd-panel-content a { color: var(--panel-color, #d4a853); }
+.nsd-panel-content img { max-width: 100%; border-radius: 6px; margin: .8em 0; display: block; }
+.nsd-panel-content blockquote {
+  border-left: 3px solid var(--panel-color, #d4a853);
+  margin: 1.2em 0;
+  padding: .5em 1em;
+  color: var(--muted);
+  font-style: italic;
+}
+.nsd-panel-content ul,
+.nsd-panel-content ol { padding-left: 1.5em; margin: 0 0 1em; }
+.nsd-panel-content li  { margin-bottom: .4em; }
+.nsd-panel-content figure { margin: 1em 0; }
+.nsd-panel-content figcaption { font-size: 12px; color: var(--muted); text-align: center; margin-top: 4px; }
+
+/* YouTube embed replacement */
+.nsd-yt-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1em 0;
+  background: #000;
+}
+.nsd-yt-wrap img { width: 100%; display: block; opacity: .85; }
+.nsd-yt-play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.nsd-yt-play-btn svg {
+  width: 56px; height: 56px;
+  filter: drop-shadow(0 2px 12px rgba(0,0,0,.6));
+  transition: transform .2s;
+}
+.nsd-yt-play-btn:hover svg { transform: scale(1.1); }
+
+/* Panel loading skeleton */
+.nsd-panel-skel {
+  display: flex; flex-direction: column; gap: 11px; padding: 4px 0;
+}
+
+/* ─── PANEL FOOTER ───────────────────── */
+.nsd-panel-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px 18px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  transition: border-color .35s;
+}
+
+.nsd-btn-next {
+  flex: 1;
+  padding: 11px 20px;
+  border-radius: 6px;
+  border: none;
+  background: var(--panel-color, #d4a853);
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity .2s;
+  -webkit-appearance: none;
+}
+.nsd-btn-next:hover { opacity: .82; }
+
+.nsd-btn-site {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 18px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color .2s;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+.nsd-btn-site:hover { border-color: var(--muted); }
+
+/* ─── EMPTY / ERROR ──────────────────── */
+.nsd-msg {
+  padding: 0 48px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 300;
+}
+
+/* ─── RESPONSIVE ─────────────────────── */
+@media (max-width: 680px) {
+  .nsd-hdr         { padding: 0 20px; }
+  .nsd-hero-content { padding: 0 24px 40px; }
+  .nsd-hero-dots  { right: 24px; }
+  .nsd-row-hdr    { padding: 0 20px; }
+  .nsd-track      { padding: 10px 20px 22px; }
+  .nsd-card, .nsd-skel-card { flex: 0 0 190px; height: 108px; }
+  .nsd-panel-body { padding: 0 20px 16px; }
+  .nsd-panel-top-bar { padding: 0 20px; }
+  .nsd-panel-footer { padding: 14px 20px 18px; flex-wrap: wrap; }
+  .nsd-btn-next   { width: 100%; order: -1; }
+  .nsd-panel-hero { height: 160px; }
+  .nsd-msg        { padding: 0 20px; }
+}
+</style>
+
+<!-- ═══════════════ MARKUP ═══════════════ -->
+<div class="nsd" id="nsd-root">
+
+  <header class="nsd-hdr">
+    <a class="nsd-logo" href="https://nanusense.com" target="_blank" rel="noopener">
+      <span class="nsd-logo-main">Nanusense</span>
+      <span class="nsd-logo-sub">/ Discover</span>
+    </a>
+    <div class="nsd-hdr-right">
+      <button class="nsd-theme-btn" id="nsd-theme-btn" aria-label="Toggle theme">
+        <!-- icon injected by JS -->
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="nsd-hero" id="nsd-hero">
+    <div class="nsd-hero-bg" id="nsd-hero-bg"></div>
+    <div class="nsd-hero-veil"></div>
+    <div class="nsd-hero-content" id="nsd-hero-content">
+      <!-- injected by JS -->
+    </div>
+    <div class="nsd-hero-dots" id="nsd-hero-dots"></div>
+  </section>
+
+  <main class="nsd-main" id="nsd-main"></main>
+
+  <!-- READING MODAL -->
+  <div class="nsd-overlay" id="nsd-overlay" role="dialog" aria-modal="true">
+    <div class="nsd-panel" id="nsd-panel">
+      <div class="nsd-panel-hero" id="nsd-panel-hero"></div>
+      <div class="nsd-panel-top-bar">
+        <span class="nsd-panel-pill" id="nsd-panel-pill"></span>
+        <button class="nsd-panel-close" id="nsd-panel-close" aria-label="Close">✕</button>
+      </div>
+      <div class="nsd-panel-body" id="nsd-panel-body"></div>
+      <div class="nsd-panel-footer">
+        <button class="nsd-btn-next" id="nsd-btn-next">↺ Next story</button>
+        <a class="nsd-btn-site" id="nsd-btn-site" href="#" target="_blank" rel="noopener">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Read on site
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ══ CONFIG ══════════════════════════════════════ */
+  const API = 'https://nanusense.com/wp-json/wp/v2';
+
+  const CAT_ORDER = ['sandbox','sandscapes','sandviper','featured','sand-up','sandwave','sleight-of-sand'];
+
+  const CAT = {
+    'sandbox':          { label: 'SandBox',         color: '#d4a853' },
+    'sandscapes':       { label: 'SandScapes',       color: '#7aab7a' },
+    'sandviper':        { label: 'SandViper',        color: '#e07a5f' },
+    'featured':         { label: 'Featured',         color: '#6b7fd7' },
+    'sand-up':          { label: 'Sand Up',          color: '#4ecdc4' },
+    'sandwave':         { label: 'SandWave',         color: '#74b3ce' },
+    'sleight-of-sand':  { label: 'Sleight of Sand',  color: '#c97fb7' },
+  };
+
+  /* ══ ELEMENTS ════════════════════════════════════ */
+  const ROOT       = document.getElementById('nsd-root');
+  const MAIN       = document.getElementById('nsd-main');
+  const THEME_BTN  = document.getElementById('nsd-theme-btn');
+  const HERO_BG    = document.getElementById('nsd-hero-bg');
+  const HERO_CON   = document.getElementById('nsd-hero-content');
+  const HERO_DOTS  = document.getElementById('nsd-hero-dots');
+  const OVERLAY    = document.getElementById('nsd-overlay');
+  const PANEL_HERO = document.getElementById('nsd-panel-hero');
+  const PANEL_PILL = document.getElementById('nsd-panel-pill');
+  const PANEL_BODY = document.getElementById('nsd-panel-body');
+  const PANEL_CLS  = document.getElementById('nsd-panel-close');
+  const BTN_NEXT   = document.getElementById('nsd-btn-next');
+  const BTN_SITE   = document.getElementById('nsd-btn-site');
+
+  /* ══ SVGS ════════════════════════════════════════ */
+  const SVG_SUN  = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const SVG_MOON = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  const SVG_PLAY = `<svg viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>`;
+  const SVG_SHUF = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>`;
+
+  /* ══ THEME ═══════════════════════════════════════ */
+  const savedTheme = localStorage.getItem('nsd-theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  function applyTheme(t) {
+    ROOT.dataset.theme = t; document.body.className = t === 'light' ? 'light' : '';
+    THEME_BTN.innerHTML = t === 'dark' ? SVG_SUN : SVG_MOON;
+  }
+  THEME_BTN.addEventListener('click', () => {
+    const next = ROOT.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem('nsd-theme', next);
+  });
+  applyTheme(savedTheme);
+
+  /* ══ UTILS ═══════════════════════════════════════ */
+  const strip = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent || ''; };
+  const fmt   = iso => new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  const pick  = a => a[Math.floor(Math.random() * a.length)];
+  const pickEx = (a, id) => { const f = a.filter(p => p.id !== id); return f.length ? pick(f) : a[0]; };
+
+  function getFeatImg(post, size) {
+    try {
+      const m = post._embedded?.['wp:featuredmedia']?.[0];
+      if (!m || m.code) return null;
+      return (size && m.media_details?.sizes?.[size]?.source_url)
+        || m.media_details?.sizes?.large?.source_url
+        || m.media_details?.sizes?.medium_large?.source_url
+        || m.source_url || null;
+    } catch { return null; }
+  }
+
+  /* ══ YOUTUBE PROCESSOR ═══════════════════════════ */
+  function processContent(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    // Replace YouTube / WordPress oembed iframes
+    div.querySelectorAll('iframe').forEach(iframe => {
+      const src = iframe.getAttribute('src') || iframe.getAttribute('data-src') || '';
+      const m = src.match(/(?:youtube\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+      if (!m) return;
+      const vid = m[1];
+      const thumb = `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+      const href  = `https://www.youtube.com/watch?v=${vid}`;
+      const wrap  = document.createElement('div');
+      wrap.className = 'nsd-yt-wrap';
+      wrap.innerHTML = `
+        <img src="${thumb}" alt="YouTube video" loading="lazy">
+        <a class="nsd-yt-play-btn" href="${href}" target="_blank" rel="noopener" aria-label="Watch on YouTube">
+          <svg viewBox="0 0 68 48" fill="none"><path d="M66.5 7.8a8.5 8.5 0 0 0-6-6C56.1 0 34 0 34 0S11.9 0 7.5 1.8a8.5 8.5 0 0 0-6 6C0 12.2 0 24 0 24s0 11.8 1.5 16.2a8.5 8.5 0 0 0 6 6C11.9 48 34 48 34 48s22.1 0 26.5-1.8a8.5 8.5 0 0 0 6-6C68 35.8 68 24 68 24s0-11.8-1.5-16.2z" fill="#FF0000"/><polygon points="45,24 27,14 27,34" fill="white"/></svg>
+        </a>`;
+      iframe.parentNode.replaceChild(wrap, iframe);
+    });
+
+    // Fix relative image URLs
+    div.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src');
+      if (src && src.startsWith('/')) {
+        img.setAttribute('src', 'https://nanusense.com' + src);
+      }
+      img.setAttribute('loading', 'lazy');
+    });
+
+    // Open all links in new tab
+    div.querySelectorAll('a').forEach(a => {
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener');
+    });
+
+    return div.innerHTML;
+  }
+
+  /* ══ SKELETON ════════════════════════════════════ */
+  function skelCards(track, n) {
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement('div');
+      c.className = 'nsd-skel-card';
+      track.appendChild(c);
+    }
+  }
+
+  function skelPanel() {
+    return `<div class="nsd-panel-skel">
+      <div class="nsd-skel-line" style="height:28px;width:72%"></div>
+      <div class="nsd-skel-line" style="height:28px;width:50%"></div>
+      <div class="nsd-skel-line" style="height:10px;width:20%;margin-top:2px"></div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+        ${Array(6).fill(`<div class="nsd-skel-line" style="height:13px;width:${85+Math.random()*15|0}%"></div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  /* ══ SKELETONS ═══════════════════════════════════ */
+  function renderSkeletons() {
+    MAIN.innerHTML = '';
+    HERO_CON.innerHTML = `<div class="nsd-panel-skel" style="padding-bottom:16px">
+      <div class="nsd-skel-line" style="height:12px;width:90px;border-radius:4px;margin-bottom:14px"></div>
+      <div class="nsd-skel-line" style="height:44px;width:80%"></div>
+      <div class="nsd-skel-line" style="height:44px;width:60%;margin-bottom:14px"></div>
+      <div class="nsd-skel-line" style="height:12px;width:95%"></div>
+      <div class="nsd-skel-line" style="height:12px;width:78%"></div>
+    </div>`;
+
+    CAT_ORDER.forEach((slug, i) => {
+      const cfg = CAT[slug]; if (!cfg) return;
+      const row = document.createElement('div');
+      row.className = 'nsd-row';
+      row.style.animationDelay = `${i * .045}s`;
+      row.innerHTML = `<div class="nsd-row-hdr">
+        <span class="nsd-row-name" style="--row-color:${cfg.color}">${cfg.label}</span>
+        <div class="nsd-row-rule"></div>
+        <div class="nsd-skel-line" style="height:28px;width:90px;border-radius:4px"></div>
+      </div>`;
+      const wrap = document.createElement('div'); wrap.className = 'nsd-track-wrap';
+      const track = document.createElement('div'); track.className = 'nsd-track';
+      skelCards(track, 6);
+      wrap.appendChild(track); row.appendChild(wrap); MAIN.appendChild(row);
+    });
+  }
+
+  /* ══ HERO ════════════════════════════════════════ */
+  let heroPosts = [], heroIdx = 0, heroTimer = null;
+
+  function setHero(post, cfg, animate) {
+    const img = getFeatImg(post, 'large');
+    const title = strip(post.title?.rendered || '');
+    const excerpt = strip(post.excerpt?.rendered || '');
+
+    if (animate) {
+      HERO_CON.style.opacity = '0';
+      HERO_BG.style.opacity  = '0';
+      setTimeout(() => {
+        renderHeroContent(img, title, excerpt, cfg, post.link);
+        HERO_CON.style.opacity = '1';
+        HERO_BG.style.opacity  = '1';
+      }, 500);
+    } else {
+      renderHeroContent(img, title, excerpt, cfg, post.link);
+    }
+  }
+
+  function renderHeroContent(img, title, excerpt, cfg, link) {
+    if (img) {
+      HERO_BG.style.backgroundImage = `url('${img}')`;
+    } else {
+      HERO_BG.style.backgroundImage = `linear-gradient(135deg, ${cfg.color} 0%, #111 100%)`;
+    }
+
+    HERO_CON.innerHTML = `
+      <div class="nsd-hero-pill" style="background:${cfg.color}">${cfg.label}</div>
+      <h2 class="nsd-hero-title">${title}</h2>
+      ${excerpt ? `<p class="nsd-hero-excerpt">${excerpt.substring(0, 200)}${excerpt.length > 200 ? '…' : ''}</p>` : ''}
+      <div class="nsd-hero-btns">
+        <a class="nsd-hero-btn-a" href="${link || '#'}" target="_blank" rel="noopener">
+          ${SVG_PLAY.replace('width="12" height="12"','')} Read Now
+        </a>
+        <button class="nsd-hero-btn-b" id="nsd-hero-shuffle">
+          ${SVG_SHUF.replace('width="12" height="12"','')} Shuffle
+        </button>
+      </div>`;
+
+    const sf = document.getElementById('nsd-hero-shuffle');
+    if (sf) {
+      sf.addEventListener('click', () => {
+        clearInterval(heroTimer);
+        heroIdx = (heroIdx + 1) % heroPosts.length;
+        setHero(heroPosts[heroIdx], getCfgForPost(heroPosts[heroIdx]), true);
+        updateDots();
+        startHeroTimer();
+      });
+    }
+  }
+
+  function updateDots() {
+    HERO_DOTS.innerHTML = '';
+    heroPosts.slice(0, 6).forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'nsd-hero-dot' + (i === heroIdx ? ' active' : '');
+      d.setAttribute('aria-label', `Hero ${i+1}`);
+      d.addEventListener('click', () => {
+        clearInterval(heroTimer);
+        heroIdx = i;
+        setHero(heroPosts[heroIdx], getCfgForPost(heroPosts[heroIdx]), true);
+        updateDots();
+        startHeroTimer();
+      });
+      HERO_DOTS.appendChild(d);
+    });
+  }
+
+  function startHeroTimer() {
+    clearInterval(heroTimer);
+    if (heroPosts.length < 2) return;
+    heroTimer = setInterval(() => {
+      heroIdx = (heroIdx + 1) % Math.min(heroPosts.length, 6);
+      setHero(heroPosts[heroIdx], getCfgForPost(heroPosts[heroIdx]), true);
+      updateDots();
+    }, 8000);
+  }
+
+  function getCfgForPost(post) {
+    const catId = post.categories?.[0];
+    const slug  = catSlugById[catId] || 'sandbox';
+    return CAT[slug] || CAT['sandbox'];
+  }
+
+  /* ══ ROWS ════════════════════════════════════════ */
+  function makeCard(post, cfg) {
+    const img    = getFeatImg(post, 'medium_large');
+    const title  = strip(post.title?.rendered || 'Untitled');
+    const date   = fmt(post.date);
+    const link   = post.link || '#';
+
+    const card = document.createElement('a');
+    card.className = 'nsd-card';
+    card.href = link;
+    card.target = '_blank';
+    card.rel = 'noopener';
+    card.setAttribute('aria-label', title);
+    card.style.setProperty('--row-color', cfg.color);
+
+    card.innerHTML = `
+      ${img ? `<img class="nsd-card-img" src="${img}" alt="" loading="lazy">` : ''}
+      <div class="nsd-card-grad"></div>
+      <div class="nsd-card-body">
+        <div class="nsd-card-date">${date}</div>
+        <div class="nsd-card-title">${title}</div>
+      </div>
+      <div class="nsd-card-hover">
+        <span class="nsd-card-play">
+          ${SVG_PLAY} Read
+        </span>
+      </div>`;
+
+    return card;
+  }
+
+  function renderRows(grouped, catMap) {
+    MAIN.innerHTML = '';
+    CAT_ORDER.forEach((slug, i) => {
+      const cfg   = CAT[slug]; if (!cfg) return;
+      const meta  = catMap[slug];
+      const catId = meta?.id;
+      const posts = (catId && grouped[catId]) ? grouped[catId] : [];
+      const count = meta?.count ?? posts.length;
+
+      const row = document.createElement('div');
+      row.className = 'nsd-row';
+      row.style.animationDelay = `${i * .055}s`;
+
+      const hdr = document.createElement('div');
+      hdr.className = 'nsd-row-hdr';
+      hdr.innerHTML = `
+        <span class="nsd-row-name" style="--row-color:${cfg.color}">${cfg.label}</span>
+        <span class="nsd-row-count">${count} ${count === 1 ? 'post' : 'posts'}</span>
+        <div class="nsd-row-rule"></div>
+        <button class="nsd-shuffle-btn" style="--row-color:${cfg.color}" aria-label="Shuffle ${cfg.label}">
+          ${SVG_SHUF} Shuffle
+        </button>`;
+
+      const wrap  = document.createElement('div'); wrap.className = 'nsd-track-wrap';
+      const track = document.createElement('div'); track.className = 'nsd-track';
+
+      if (!posts.length) {
+        wrap.innerHTML = `<p class="nsd-msg">No posts found in this category.</p>`;
+      } else {
+        posts.forEach(p => track.appendChild(makeCard(p, cfg)));
+        wrap.appendChild(track);
+      }
+
+      hdr.querySelector('.nsd-shuffle-btn').addEventListener('click', () => {
+        if (posts.length) openModal(posts, cfg);
+      });
+
+      row.appendChild(hdr); row.appendChild(wrap); MAIN.appendChild(row);
+    });
+  }
+
+  /* ══ MODAL ═══════════════════════════════════════ */
+  let modalPosts = [], modalCfg = null, modalPostId = null;
+
+  function openModal(posts, cfg) {
+    modalPosts  = posts;
+    modalCfg    = cfg;
+    PANEL_PILL.textContent       = cfg.label;
+    PANEL_PILL.style.background  = cfg.color;
+    BTN_NEXT.textContent         = `↺ Next in ${cfg.label}`;
+    BTN_NEXT.style.background    = cfg.color;
+    document.getElementById('nsd-panel').style.setProperty('--panel-color', cfg.color);
+    OVERLAY.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const p = pick(posts);
+    modalPostId = p.id;
+    loadModalPost(p);
+  }
+
+  function loadModalPost(postOrId) {
+    PANEL_BODY.innerHTML = skelPanel();
+    PANEL_HERO.innerHTML = '';
+    BTN_SITE.href = '#';
+
+    const id = typeof postOrId === 'object' ? postOrId.id : postOrId;
+
+    // Optimistic hero from cached data
+    const cached = modalPosts.find(p => p.id === id);
+    if (cached) {
+      const img = getFeatImg(cached, 'large');
+      renderPanelHero(img, modalCfg.color);
+    }
+
+    fetch(`${API}/posts/${id}?_embed=wp:featuredmedia&_fields=id,title,content,date,link,_embedded,_links`)
+      .then(r => { if (!r.ok) throw r.status; return r.json(); })
+      .then(post => {
+        const title   = strip(post.title?.rendered || 'Untitled');
+        const date    = fmt(post.date);
+        const content = processContent(post.content?.rendered || '<p>Content unavailable.</p>');
+        const link    = post.link || '#';
+        const img     = getFeatImg(post, 'large');
+
+        renderPanelHero(img, modalCfg.color);
+        BTN_SITE.href = link;
+        modalPostId   = post.id;
+
+        PANEL_BODY.innerHTML = `
+          <div class="nsd-panel-title">${title}</div>
+          <div class="nsd-panel-date">${date}</div>
+          <div class="nsd-panel-content">${content}</div>`;
+        PANEL_BODY.scrollTop = 0;
+      })
+      .catch(() => {
+        PANEL_BODY.innerHTML = `<p style="color:var(--muted);font-size:14px;font-weight:300">
+          Couldn't load this post. Try shuffling again.</p>`;
+      });
+  }
+
+  function renderPanelHero(img, color) {
+    if (img) {
+      PANEL_HERO.innerHTML = `
+        <img class="nsd-panel-hero-img" src="${img}" alt="" loading="eager">
+        <div class="nsd-panel-hero-grad"></div>`;
+    } else {
+      PANEL_HERO.innerHTML = `<div class="nsd-panel-hero-no-img">NANUSENSE</div>`;
+      PANEL_HERO.style.background = `linear-gradient(135deg, ${color} 0%, #111 120%)`;
+    }
+  }
+
+  function closeModal() {
+    OVERLAY.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  PANEL_CLS.addEventListener('click', closeModal);
+  OVERLAY.addEventListener('click', e => { if (e.target === OVERLAY) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && OVERLAY.classList.contains('open')) closeModal(); });
+  BTN_NEXT.addEventListener('click', () => {
+    if (!modalPosts.length) return;
+    const next = pickEx(modalPosts, modalPostId);
+    if (next) { modalPostId = next.id; loadModalPost(next); }
+  });
+
+  /* ══ BOOT ════════════════════════════════════════ */
+  let catSlugById = {};
+
+  async function boot() {
+    renderSkeletons();
+    try {
+      const [catRes, p1Res, p2Res] = await Promise.all([
+        fetch(`${API}/categories?per_page=50`),
+        fetch(`${API}/posts?per_page=100&page=1&_embed=wp:featuredmedia&_fields=id,title,excerpt,date,link,categories,featured_media,_links,_embedded`),
+        fetch(`${API}/posts?per_page=100&page=2&_embed=wp:featuredmedia&_fields=id,title,excerpt,date,link,categories,featured_media,_links,_embedded`),
+      ]);
+
+      const cats  = await catRes.json();
+      const page1 = await p1Res.json();
+      const page2 = p2Res.ok ? await p2Res.json() : [];
+
+      /* category map: slug → { id, count } */
+      const catMap = {};
+      cats.forEach(c => {
+        if (c.slug && c.slug !== 'uncategorized') {
+          catMap[c.slug] = { id: c.id, name: c.name, count: c.count };
+          catSlugById[c.id] = c.slug;
+        }
+      });
+
+      /* group posts */
+      const grouped = {};
+      const allPosts = [...page1, ...(Array.isArray(page2) ? page2 : [])];
+      allPosts.forEach(p => {
+        const id = p.categories?.[0];
+        if (id) { if (!grouped[id]) grouped[id] = []; grouped[id].push(p); }
+      });
+
+      /* hero — prefer Featured posts with images, else any with image */
+      const featId  = catMap['featured']?.id;
+      const featPosts = featId ? (grouped[featId] || []) : [];
+      const withImg = (list) => list.filter(p => getFeatImg(p));
+      heroPosts = withImg(featPosts).length ? withImg(featPosts) : withImg(allPosts);
+      if (!heroPosts.length) heroPosts = featPosts.length ? featPosts : allPosts.slice(0, 6);
+
+      heroIdx = 0;
+      setHero(heroPosts[0], getCfgForPost(heroPosts[0]), false);
+      updateDots();
+      startHeroTimer();
+
+      renderRows(grouped, catMap);
+    } catch(e) {
+      MAIN.innerHTML = `<p class="nsd-msg" style="padding-top:40px">
+        Failed to load posts. Please refresh the page.</p>`;
+    }
+  }
+
+  boot();
+})();
+</script>
+
+</body>
+</html>
