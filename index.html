@@ -390,9 +390,33 @@ function processContent(html) {
     iframe.parentNode.replaceChild(wrap, iframe);
   });
   div.querySelectorAll('img').forEach(img => {
-    const s = img.getAttribute('src');
-    if (s && s.startsWith('/')) img.setAttribute('src','https://nanusense.com'+s);
+    // Resolve lazy-load plugin data attributes → src
+    const lazySrc = img.getAttribute('data-src')
+      || img.getAttribute('data-lazy-src')
+      || img.getAttribute('data-original')
+      || img.getAttribute('data-lazy')
+      || img.getAttribute('data-pagespeed-lazy-src');
+    if (lazySrc) {
+      img.setAttribute('src', lazySrc);
+      ['data-src','data-lazy-src','data-original','data-lazy','data-pagespeed-lazy-src'].forEach(a => img.removeAttribute(a));
+    }
+
+    // Fix relative src
+    let s = img.getAttribute('src') || '';
+    if (s.startsWith('/')) s = 'https://nanusense.com' + s;
+    if (s.startsWith('http://')) s = s.replace('http://','https://');
+    if (s) img.setAttribute('src', s);
+
+    // Fix srcset (lazy plugins also swap this)
+    const srcsetAttr = img.getAttribute('srcset') || img.getAttribute('data-srcset') || img.getAttribute('data-lazy-srcset') || '';
+    if (srcsetAttr) {
+      img.setAttribute('srcset', srcsetAttr.replace(/http:\/\//g,'https://'));
+      img.removeAttribute('data-srcset'); img.removeAttribute('data-lazy-srcset');
+    }
+
     img.setAttribute('loading','lazy');
+    // Remove classes that trigger JS-based lazy loaders (they won't run here)
+    img.classList.remove('lazyload','lazy','wp-lazy','jetpack-lazy-image');
   });
   div.querySelectorAll('a').forEach(a => { a.target='_blank'; a.rel='noopener'; });
   return div.innerHTML;
