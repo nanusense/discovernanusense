@@ -333,8 +333,6 @@
 
   <!-- TAGLINE -->
   <div class="nsd-tagline">
-    Netflix-style discovery for older stories
-    <span class="nsd-tagline-sep">·</span>
     139 posts across 7 categories
     <span class="nsd-tagline-sep">·</span>
     Start anywhere
@@ -463,10 +461,13 @@ function processContent(html) {
   // ── Step 1: pre-process raw string ──────────────────────────────────
   // Strip WordPress block editor comments
   html = html.replace(/<!--\s*\/?wp:[^>]*-->/g, '');
-  // Strip known shortcodes (wrapped + self-closing)
-  const SC = 'gallery|caption|wp_caption|video|audio|playlist|embed|jetpack_subscription_form|contact-form';
-  html = html.replace(new RegExp(`\\[(?:${SC})[^\\]]*\\][\\s\\S]*?\\[/(?:${SC})\\]`, 'gi'), '');
-  html = html.replace(new RegExp(`\\[(?:${SC})[^\\]]*/?\\]`, 'gi'), '');
+  // Fully remove content-free shortcodes (gallery, forms) including inner content
+  const SC_FULL = 'gallery|caption|wp_caption|playlist|jetpack_subscription_form|contact-form';
+  html = html.replace(new RegExp(`\\[(?:${SC_FULL})[^\\]]*\\][\\s\\S]*?\\[/(?:${SC_FULL})\\]`, 'gi'), '');
+  html = html.replace(new RegExp(`\\[(?:${SC_FULL})[^\\]]*/?\\]`, 'gi'), '');
+  // Strip ALL remaining shortcode tags (WPBakery vc_*, Elementor, etc.) — preserve inner text
+  html = html.replace(/\[\/[a-zA-Z_][a-zA-Z0-9_-]*\]/g, '');
+  html = html.replace(/\[[a-zA-Z_][a-zA-Z0-9_-]*(?:\s[^\]]*)?\/?\]/g, '');
 
   // ── Step 2: DOM parse ────────────────────────────────────────────────
   const div = document.createElement('div');
