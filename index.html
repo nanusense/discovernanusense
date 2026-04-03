@@ -407,8 +407,19 @@ function getFeatImg(post, size) {
 }
 
 function processContent(html) {
+  // ── Step 1: pre-process raw string ──────────────────────────────────
+  // Strip WordPress block editor comments
+  html = html.replace(/<!--\s*\/?wp:[^>]*-->/g, '');
+  // Strip known shortcodes (wrapped + self-closing)
+  const SC = 'gallery|caption|wp_caption|video|audio|playlist|embed|jetpack_subscription_form|contact-form';
+  html = html.replace(new RegExp(`\\[(?:${SC})[^\\]]*\\][\\s\\S]*?\\[/(?:${SC})\\]`, 'gi'), '');
+  html = html.replace(new RegExp(`\\[(?:${SC})[^\\]]*/?\\]`, 'gi'), '');
+
+  // ── Step 2: DOM parse ────────────────────────────────────────────────
   const div = document.createElement('div');
   div.innerHTML = html;
+
+  // ── Step 3: YouTube iframes ──────────────────────────────────────────
   div.querySelectorAll('iframe').forEach(iframe => {
     const src = iframe.getAttribute('src') || '';
     const m = src.match(/(?:youtube\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})/);
@@ -422,6 +433,8 @@ function processContent(html) {
       </a>`;
     iframe.parentNode.replaceChild(wrap, iframe);
   });
+
+  // ── Step 4: Images ───────────────────────────────────────────────────
   div.querySelectorAll('img').forEach(img => {
     // Resolve lazy-load plugin data attributes → src
     const lazySrc = img.getAttribute('data-src')
@@ -433,25 +446,37 @@ function processContent(html) {
       img.setAttribute('src', lazySrc);
       ['data-src','data-lazy-src','data-original','data-lazy','data-pagespeed-lazy-src'].forEach(a => img.removeAttribute(a));
     }
-
-    // Fix relative src
+    // Fix relative / HTTP src
     let s = img.getAttribute('src') || '';
     if (s.startsWith('/')) s = 'https://nanusense.com' + s;
     if (s.startsWith('http://')) s = s.replace('http://','https://');
     if (s) img.setAttribute('src', s);
-
-    // Fix srcset (lazy plugins also swap this)
+    // Fix srcset
     const srcsetAttr = img.getAttribute('srcset') || img.getAttribute('data-srcset') || img.getAttribute('data-lazy-srcset') || '';
     if (srcsetAttr) {
       img.setAttribute('srcset', srcsetAttr.replace(/http:\/\//g,'https://'));
       img.removeAttribute('data-srcset'); img.removeAttribute('data-lazy-srcset');
     }
-
+    // Remove height → prevents stretch when max-width shrinks the image
+    img.removeAttribute('height');
+    img.removeAttribute('data-recalc-dims');
+    img.removeAttribute('decoding');
     img.setAttribute('loading','lazy');
-    // Remove classes that trigger JS-based lazy loaders (they won't run here)
-    img.classList.remove('lazyload','lazy','wp-lazy','jetpack-lazy-image');
+    // Strip WP alignment / size classes and lazy-loader triggers
+    ['alignnone','aligncenter','alignleft','alignright','alignwide','alignfull',
+     'size-full','size-large','size-medium','size-thumbnail',
+     'lazyload','lazy','wp-lazy','jetpack-lazy-image'].forEach(c => img.classList.remove(c));
+    img.className = img.className.split(' ').filter(c => !c.startsWith('wp-image-')).join(' ');
   });
+
+  // ── Step 5: Empty paragraphs ─────────────────────────────────────────
+  div.querySelectorAll('p').forEach(p => {
+    if (!p.textContent.trim() && !p.querySelector('img,iframe,video')) p.remove();
+  });
+
+  // ── Step 6: Links ────────────────────────────────────────────────────
   div.querySelectorAll('a').forEach(a => { a.target='_blank'; a.rel='noopener'; });
+
   return div.innerHTML;
 }
 
